@@ -1,6 +1,8 @@
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
+set(OpenCV_STATIC on)
+set(OpenCV_DIR $ENV{OPENCV_ANDROID}/sdk/native/jni)
 find_package(OpenCV REQUIRED)
 
 set( DETECTION_SOURCES Detection.cpp Slices.cpp)
