@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.example.videosentinel.databinding.ActivityMainBinding
 
@@ -24,7 +25,8 @@ class MainActivity : AppCompatActivity() {
         // Create and display dstBitmap in image view, we will keep updating
         // dstBitmap and the changes will be displayed on screen
         dstBitmap = srcBitmap!!.copy(srcBitmap!!.config, true)
-        imageView.setImageBitmap(dstBitmap)
+        val imgView = findViewById<ImageView>(R.id.imageView)
+        imgView.setImageBitmap(dstBitmap)
     }
 
     fun btnRect_click(view: View){
