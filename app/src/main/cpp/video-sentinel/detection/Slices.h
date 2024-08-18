@@ -15,8 +15,8 @@ struct Slice {
   math2d::Point start = math2d::Point{0, 0};
   math2d::Point end = math2d::Point{0, 0};
 
-  friend constexpr auto operator<=>(const Slice &lhs,
-                                    const Slice &rhs) = default;
+  //friend constexpr auto operator<=>(const Slice &lhs,
+  //                                  const Slice &rhs) = default;
 
   bool touches(const Slice &other) const {
     return (start.x >= other.start.x && start.x <= other.end.x) ||
@@ -41,8 +41,8 @@ struct Slice {
 struct AnnotatedSlice {
   Slice slice;
   size_t line_number = 0;
-  friend constexpr auto operator<=>(const AnnotatedSlice &lhs,
-                                    const AnnotatedSlice &rhs) = default;
+  //friend constexpr auto operator<=>(const AnnotatedSlice &lhs,
+  //                                  const AnnotatedSlice &rhs) = default;
 };
 
 struct SliceLine {
