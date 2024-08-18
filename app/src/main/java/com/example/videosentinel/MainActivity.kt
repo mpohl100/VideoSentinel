@@ -11,6 +11,7 @@ import com.example.videosentinel.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    var originalBitmap: Bitmap? = null
     var srcBitmap: Bitmap? = null
     var dstBitmap: Bitmap? = null
 
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
         // Load the original image
         srcBitmap = BitmapFactory.decodeResource(this.resources, R.drawable.mountain)
+        originalBitmap = BitmapFactory.decodeResource(this.resources, R.drawable.mountain)
+
 
         // Create and display dstBitmap in image view, we will keep updating
         // dstBitmap and the changes will be displayed on screen
@@ -31,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     fun btnRect_click(view: View){
         // This is the actual call to the rect method inside native-lib.cpp
-        this.rect(srcBitmap!!, srcBitmap!!)
+        this.rect(originalBitmap!!, dstBitmap!!)
     }
 
     /**
