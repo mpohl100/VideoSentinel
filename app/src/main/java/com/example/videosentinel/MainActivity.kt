@@ -46,9 +46,9 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
-        // Used to load the 'videosentinel' library on application startup.
+        // Used to load the 'native-lib' library on application startup.
         init {
-            System.loadLibrary("videosentinel")
+            System.loadLibrary("native-lib")
         }
     }
 }

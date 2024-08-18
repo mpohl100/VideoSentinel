@@ -95,7 +95,7 @@ void matToBitmap(JNIEnv* env, Mat src, jobject bitmap, jboolean needPremultiplyA
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_vyw_androidopencvdemo_MainActivity_stringFromJNI(
+Java_com_example_videosentinel_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
@@ -103,7 +103,7 @@ Java_com_vyw_androidopencvdemo_MainActivity_stringFromJNI(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_vyw_androidopencvdemo_MainActivity_rect(JNIEnv *env, jobject p_this, jobject bitmapIn, jobject bitmapOut) {
+Java_com_example_videosentinel_MainActivity_rect(JNIEnv *env, jobject p_this, jobject bitmapIn, jobject bitmapOut) {
     Mat src;
     bitmapToMat(env, bitmapIn, src, false);
     addRectangles(src);
