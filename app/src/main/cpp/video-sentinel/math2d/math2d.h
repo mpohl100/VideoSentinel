@@ -163,10 +163,16 @@ public:
   number_type area() const;
   std::string toString() const;
   //friend constexpr auto operator<=>(const Circle &, const Circle &) = default;
-
+  friend bool operator<(const Point& l, const Point& r);
+  friend bool operator==(const Point& l, const Point& r);
+  friend bool operator!=(const Point& l, const Point& r);
 private:
   Point _center;
   number_type _radius;
 };
+
+bool operator<(const Point& l, const Point& r);
+bool operator==(const Point& l, const Point& r);
+bool operator!=(const Point& l, const Point& r);
 
 }

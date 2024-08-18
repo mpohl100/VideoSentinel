@@ -1,6 +1,7 @@
 #include "opencv-utils.h"
 #include "video-sentinel/webcam/webcam.h"
 #include "video-sentinel/par/parallel.h"
+#include "video-sentinel/detection/Rectangle.h"
 
 #include <opencv2/imgproc.hpp>
 
@@ -14,23 +15,23 @@ void myBlur(Mat src, float sigma) {
     GaussianBlur(src, src, Size(), sigma);
 }
 
-static FrameData frameData = {};
+static webcam::FrameData frameData = {};
 static par::Task nextRectangleTask = {};
 static par::Executor executor = par::Executor{1};
 
 
 void addRectangles(Mat src){
-    const auto rectangle = od::Rectangle{0, 0, src.cols, src.rows};
+    const auto surrounding_rectangle = od::Rectangle{0, 0, src.cols, src.rows};
     int rings = 1;
     int gradient_threshold = 20;
 
     frameData = webcam::FrameData{src};
-    auto flow = webcam::process_frame(frame_data, src, rectangle, rings, gradient_threshold);
+    auto flow = webcam::process_frame(frameData, src, surrounding_rectangle, rings, gradient_threshold);
     executor.run(flow);
     executor.wait_for(flow);
     
     // draw all rectangles
-    for (const auto &rectangle : frame_data.all_rectangles.rectangles) {
+    for (const auto &rectangle : frameData.all_rectangles.rectangles) {
       int rectX = std::max(0, rectangle.x);
       int rectY = std::max(0, rectangle.y);
       int rectWidth = std::min(src.cols - rectX, rectangle.width);
