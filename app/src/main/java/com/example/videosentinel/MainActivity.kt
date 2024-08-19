@@ -1,9 +1,11 @@
 package com.example.videosentinel
 
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -127,6 +129,24 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         return null
+    }
+
+    // Inflate the menu; this adds items to the action bar if it is present.
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflate the menu from the resource file
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    // Handle menu item clicks
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_rect -> {
+                btnRect_click()  // Call the rectClicked function
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     /**
