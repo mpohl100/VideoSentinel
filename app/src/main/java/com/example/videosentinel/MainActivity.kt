@@ -27,8 +27,9 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     var frame: ImageView? = null
-    private var srcBitmap: Bitmap? = null;
-    private var dstBitmap: Bitmap? = null;
+    private var srcBitmap: Bitmap? = null
+    private var dstBitmap: Bitmap? = null
+    private var rectsProcessed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,16 +72,16 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun btnRect_click(view: View){
+    fun btnRect_click(){
         // This is the actual call to the rect method inside native-lib.cpp
         // Retrieve the current drawable (image) from the ImageView
         if(srcBitmap == null){
             return
         }
-
-        if(dstBitmap != null){
+        if(rectsProcessed){
             return
         }
+
         this.rect(srcBitmap!!, dstBitmap!!)
         frame?.setImageBitmap(dstBitmap!!)
     }
@@ -106,14 +107,16 @@ class MainActivity : AppCompatActivity() {
             //imageView.setImageURI(image_uri);
             srcBitmap = uriToBitmap(image_uri!!)
             frame?.setImageBitmap(srcBitmap)
-            dstBitmap = null
+            dstBitmap = uriToBitmap(image_uri!!)
+            rectsProcessed = false
         }
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             image_uri = data.data
             //imageView.setImageURI(image_uri);
             srcBitmap = uriToBitmap(image_uri!!)
             frame?.setImageBitmap(srcBitmap)
-            dstBitmap = null
+            dstBitmap = uriToBitmap(image_uri!!)
+            rectsProcessed = false
         }
     }
 
