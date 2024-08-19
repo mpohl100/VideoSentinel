@@ -8,33 +8,125 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.videosentinel.databinding.ActivityMainBinding
+import android.Manifest
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.util.Log
+import android.view.View.OnLongClickListener
+import java.io.FileDescriptor
+import java.io.IOException
+
 
 class MainActivity : AppCompatActivity() {
 
-    var originalBitmap: Bitmap? = null
-    var srcBitmap: Bitmap? = null
-    var dstBitmap: Bitmap? = null
+    var frame: ImageView? = null
+    private var srcBitmap: Bitmap? = null;
+    private var dstBitmap: Bitmap? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+        frame = findViewById<ImageView>(R.id.imageView);
 
-        // Load the original image
-        srcBitmap = BitmapFactory.decodeResource(this.resources, R.drawable.mountain)
-        originalBitmap = BitmapFactory.decodeResource(this.resources, R.drawable.mountain)
+        //TODO ask for permission of camera upon first launch of application
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_DENIED) {
+                val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                requestPermissions(permission, 112)
+            }
+        }
 
 
-        // Create and display dstBitmap in image view, we will keep updating
-        // dstBitmap and the changes will be displayed on screen
-        dstBitmap = srcBitmap!!.copy(srcBitmap!!.config, true)
-        val imgView = findViewById<ImageView>(R.id.imageView)
-        imgView.setImageBitmap(dstBitmap)
+        //TODO captue image using camera
+        frame?.setOnLongClickListener(OnLongClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
+                    val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    requestPermissions(permission, 121)
+                } else {
+                    openCamera()
+                }
+            } else {
+                openCamera()
+            }
+            true
+        })
+
+
+        //TODO chose image from gallery
+        frame?.setOnClickListener(View.OnClickListener {
+            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE)
+        })
+
     }
 
     fun btnRect_click(view: View){
         // This is the actual call to the rect method inside native-lib.cpp
-        this.rect(originalBitmap!!, dstBitmap!!)
+        // Retrieve the current drawable (image) from the ImageView
+        if(srcBitmap == null){
+            return
+        }
+
+        if(dstBitmap != null){
+            return
+        }
+        this.rect(srcBitmap!!, dstBitmap!!)
+        frame?.setImageBitmap(dstBitmap!!)
+    }
+
+    var image_uri: Uri? = null
+    private val RESULT_LOAD_IMAGE = 123
+    val IMAGE_CAPTURE_CODE = 654
+
+    //TODO opens camera so that user can capture image
+    private fun openCamera() {
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "New Picture")
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera")
+        image_uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri)
+        startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
+            //imageView.setImageURI(image_uri);
+            srcBitmap = uriToBitmap(image_uri!!)
+            frame?.setImageBitmap(srcBitmap)
+            dstBitmap = null
+        }
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+            image_uri = data.data
+            //imageView.setImageURI(image_uri);
+            srcBitmap = uriToBitmap(image_uri!!)
+            frame?.setImageBitmap(srcBitmap)
+            dstBitmap = null
+        }
+    }
+
+    //TODO takes URI of the image and returns bitmap
+    private fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
+        try {
+            val parcelFileDescriptor = contentResolver.openFileDescriptor(selectedFileUri, "r")
+            val fileDescriptor: FileDescriptor = parcelFileDescriptor!!.fileDescriptor
+            val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+            parcelFileDescriptor.close()
+            return image
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     /**
