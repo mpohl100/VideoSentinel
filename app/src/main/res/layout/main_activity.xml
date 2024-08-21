@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- You can keep this layout simple, as MainActivity is just a launcher for the other activities. -->
+    <!-- This can be a container if you plan to use fragments, or just a blank layout. -->
+
+    <!-- Placeholder content, can be removed or customized -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to MainActivity"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:visibility="gone"/>
+
+</FrameLayout>
+
+
