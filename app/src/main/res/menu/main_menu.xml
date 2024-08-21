@@ -5,4 +5,9 @@
         android:title="Rect"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_toggle_mode"
+        android:title="Photo"
+        android:checkable="true"
+        android:showAsAction="always"/>
 </menu>
