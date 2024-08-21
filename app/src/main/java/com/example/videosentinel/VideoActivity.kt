@@ -4,6 +4,15 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.TextureView
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageFormat
+import android.graphics.YuvImage
+import android.graphics.Rect
+import android.media.Image.Plane
+import android.widget.ImageView
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -14,12 +23,14 @@ class VideoActivity : Activity() {
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var viewFinder: TextureView
+    private lateinit var imageViewFiltered: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
 
         viewFinder = findViewById(R.id.viewFinder)
+        imageViewFiltered = findViewById(R.id.imageViewFiltered)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         startCamera()
@@ -32,7 +43,7 @@ class VideoActivity : Activity() {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(viewFinder.surfaceProvider)
+                it.setSurfaceProvider(viewFinder.getSurfaceProvider())
             }
 
             val imageAnalysis = ImageAnalysis.Builder()
@@ -40,8 +51,10 @@ class VideoActivity : Activity() {
                 .also {
                     it.setAnalyzer(cameraExecutor, { imageProxy ->
                         val bitmap = imageProxy.toBitmap()
-                        val filteredBitmap = applyCppFilter(bitmap)
+                        val filteredBitmap = imageProxy.toBitmap()
+                        applyCppFilter(bitmap, filteredBitmap)
                         // TODO: Display the filteredBitmap on your TextureView or another view
+                        displayFilteredBitmap(filteredBitmap)
                         imageProxy.close()
                     })
                 }
@@ -81,12 +94,27 @@ class VideoActivity : Activity() {
         return buffer.array()
     }
 
-    private fun applyCppFilter(bitmap: Bitmap): Bitmap {
-        return rect(bitmap) // Call your C++ filter here
+    private fun displayFilteredBitmap(filteredBitmap: Bitmap) {
+        imageViewFiltered.setImageBitmap(filteredBitmap)
+        imageViewFiltered.visibility = ImageView.VISIBLE
+    }
+
+    private fun applyCppFilter(bitmap: Bitmap, dest: Bitmap){
+        rect(bitmap, dest) // Call your C++ filter here
     }
 
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
     }
+
+    external fun rect(bitmapIn: Bitmap, bitmapOut: Bitmap)
+
+    companion object {
+        // Used to load the 'native-lib' library on application startup.
+        init {
+            System.loadLibrary("native-lib")
+        }
+    }
+
 }
