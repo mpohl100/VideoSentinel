@@ -3,7 +3,6 @@ package com.example.videosentinel
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import android.view.TextureView
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
@@ -14,6 +13,7 @@ import android.widget.ImageView
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import androidx.camera.core.*
+import androidx.camera.view.PreviewView
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
@@ -22,7 +22,7 @@ import java.util.concurrent.Executors
 class VideoActivity : Activity() {
 
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var viewFinder: TextureView
+    private lateinit var viewFinder: PreviewView
     private lateinit var imageViewFiltered: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +47,7 @@ class VideoActivity : Activity() {
             }
 
             val imageAnalysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, { imageProxy ->
@@ -64,7 +65,10 @@ class VideoActivity : Activity() {
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalysis
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageAnalysis
                 )
             } catch (exc: Exception) {
                 Log.e("VideoActivity", "Use case binding failed", exc)
