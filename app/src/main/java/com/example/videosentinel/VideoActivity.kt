@@ -1,6 +1,5 @@
 package com.example.videosentinel
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.graphics.Bitmap
@@ -16,10 +15,11 @@ import androidx.camera.core.*
 import androidx.camera.view.PreviewView
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class VideoActivity : Activity() {
+class VideoActivity : AppCompatActivity(){
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var viewFinder: PreviewView
@@ -120,5 +120,4 @@ class VideoActivity : Activity() {
             System.loadLibrary("native-lib")
         }
     }
-
 }
