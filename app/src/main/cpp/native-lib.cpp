@@ -109,3 +109,63 @@ Java_com_example_videosentinel_MainActivity_rect(JNIEnv *env, jobject p_this, jo
     addRectangles(src);
     matToBitmap(env, src, bitmapOut, false);
 }
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_videosentinel_MainActivity_create_preview(
+        JNIEnv *env,
+        jobject /* this */) {
+    create_preview();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_videosentinel_MainActivitydrop_preview(
+        JNIEnv *env,
+        jobject /* this */) {
+    drop_preview();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_example_videosentinel_MainActivity_shall_frame_be_posted(
+        JNIEnv *env,
+        jobject /* this */) {
+    return shall_frame_be_posted();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_videosentinel_MainActivity_set_frame(
+        JNIEnv *env,
+        jobject /* this */,
+        jobject bitmapIn) {
+    Mat src;
+    bitmapToMat(env, bitmapIn, src, false);
+    set_frame(src);
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_example_videosentinel_MainActivity_are_new_rectangles_available(
+        JNIEnv *env,
+        jobject /* this */) {
+    return are_new_rectangles_available();
+}
+
+extern "C" JNIEXPORT jobjectArray JNICALL
+Java_com_example_videosentinel_MainActivity_get_rectangles(JNIEnv* env, jobject /* this */) {
+    // Call the native function to get the vector of rectangles
+    std::vector<Rectangle> rectangles = get_rectangles();
+
+    // Get the Kotlin Rectangle class and its constructor
+    jclass rectClass = env->FindClass("com/example/videosentinel/Rectangle");
+    jmethodID constructor = env->GetMethodID(rectClass, "<init>", "(IIII)V");
+
+    // Create a new Java array of Rectangle objects
+    jobjectArray rectArray = env->NewObjectArray(rectangles.size(), rectClass, nullptr);
+
+    // Populate the array with Rectangle objects
+    for (size_t i = 0; i < rectangles.size(); ++i) {
+        const Rectangle& rect = rectangles[i];
+        jobject rectObject = env->NewObject(rectClass, constructor, rect.x, rect.y, rect.width, rect.height);
+        env->SetObjectArrayElement(rectArray, i, rectObject);
+    }
+
+    return rectArray;
+}
