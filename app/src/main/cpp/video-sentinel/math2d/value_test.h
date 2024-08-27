@@ -3,7 +3,6 @@
 #include <type_traits>
 #include <utility>
 
-#if 0
 namespace value_test {
 
 template <class T> consteval bool value_test() {
@@ -29,5 +28,3 @@ template <class T> consteval bool value_test() {
 }
 
 } // namespace value_test
-
-#endif
