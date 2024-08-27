@@ -12,10 +12,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_photo)
-
-        // Initialize in Photo mode by default
-        startPhotoActivity()
+        setContentView(R.layout.main_activity)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -29,7 +26,7 @@ class MainActivity : AppCompatActivity() {
                 isVideoMode = !isVideoMode
                 item.title = if (isVideoMode) "Video" else "Photo"
                 if (isVideoMode) {
-                    startVideoActivity()
+                    // do nothing
                 } else {
                     startPhotoActivity()
                 }
@@ -41,11 +38,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun startPhotoActivity() {
         val intent = Intent(this, PhotoActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun startVideoActivity() {
-        val intent = Intent(this, VideoActivity::class.java)
         startActivity(intent)
     }
 }
