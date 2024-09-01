@@ -13,6 +13,7 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.*
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -164,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         init {
-            System.loadLibrary("your-native-lib")
+            System.loadLibrary("native-lib")
         }
     }
 }
