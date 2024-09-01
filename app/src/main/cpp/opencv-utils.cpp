@@ -47,10 +47,11 @@ void addRectangles(Mat src){
 // ---------------------------------------------------------------------------------------------------------------
 // preview
 
-static auto video_preview = std::shared_ptr<preview::VideoPreview>(nullptr);
+static std::shared_ptr<preview::VideoPreview> video_preview = nullptr;
 
 void create_preview(){
-    video_preview = std::make_shared<preview::VideoPreview>{1};
+    auto* vp = new preview::VideoPreview{1};
+    video_preview.reset(vp);
 }
 void drop_preview(){
     video_preview = nullptr;
