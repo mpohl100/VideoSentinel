@@ -236,7 +236,7 @@ private:
 
   struct TimedTask {
     Task task;
-    std::chrono::system_clock::time_point start_time;
+    std::chrono::high_resolution_clock::time_point start_time;
   };
 
   std::thread _main_thread;
