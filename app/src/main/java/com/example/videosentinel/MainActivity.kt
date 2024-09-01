@@ -1,18 +1,59 @@
 package com.example.videosentinel
 
 import android.content.Intent
-import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
+import android.view.View
+import android.widget.FrameLayout
+import com.example.videosentinel.databinding.ActivityMainBinding
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var cameraExecutor: ExecutorService
+    private var isFrameProcessing = false
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var overlayView: RectangleOverlayView
     private var isVideoMode = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Initialize camera executor
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
+        // Setup Camera Preview and Overlay View
+        setupCameraPreview()
+        setupOverlayView()
+
+        // Enable preview
+        create_preview()
+
+        // Start drawing rectangles
+        startDrawingRectangles()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -39,5 +80,91 @@ class MainActivity : AppCompatActivity() {
     private fun startPhotoActivity() {
         val intent = Intent(this, PhotoActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun setupCameraPreview() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder().build()
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val imageAnalysis = ImageAnalysis.Builder().build().apply {
+                setAnalyzer(cameraExecutor, { imageProxy ->
+                    processFrame(imageProxy)
+                    imageProxy.close()
+                })
+            }
+
+            preview.setSurfaceProvider(binding.previewView.surfaceProvider)
+
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview, imageAnalysis
+                )
+            } catch (exc: Exception) {
+                exc.printStackTrace()
+            }
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun setupOverlayView() {
+        overlayView = RectangleOverlayView(this)
+        binding.root.addView(overlayView, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ))
+    }
+
+    private fun processFrame(imageProxy: ImageProxy) {
+        if (!isFrameProcessing) {
+            isFrameProcessing = true
+
+            // Convert ImageProxy to Bitmap
+            val bitmap = binding.previewView.bitmap
+            bitmap?.let {
+                // Check if native code is ready to receive a new frame
+                if (shall_frame_be_posted()) {
+                    set_frame(it)
+                }
+            }
+
+            isFrameProcessing = false
+        }
+    }
+
+    private fun startDrawingRectangles() {
+        handler.post(object : Runnable {
+            override fun run() {
+                // Check if new rectangles are available
+                if (are_new_rectangles_available()) {
+                    val rectangles = get_rectangles()
+                    overlayView.updateRectangles(rectangles)
+                }
+                handler.postDelayed(this, 10)  // Check every 10 milliseconds
+            }
+        })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
+
+        // Disable preview
+        drop_preview()
+    }
+
+    // JNI methods
+    external fun create_preview()
+    external fun drop_preview()
+    external fun shall_frame_be_posted(): Boolean
+    external fun set_frame(bitmap: Bitmap)
+    external fun are_new_rectangles_available(): Boolean
+    external fun get_rectangles(): Array<Rectangle>
+
+    companion object {
+        init {
+            System.loadLibrary("your-native-lib")
+        }
     }
 }
