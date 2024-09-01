@@ -39,7 +39,7 @@ public:
     std::unique_lock<std::mutex> lock(*_mutex);
     const auto now = std::chrono::high_resolution_clock::now();
     const auto start_time = now + start_difference;
-    _queued_tasks.push_back({task, start_time});
+    _queued_tasks.push_back(TimedTask{task, start_time});
   }
 
   void run(Task task) {
