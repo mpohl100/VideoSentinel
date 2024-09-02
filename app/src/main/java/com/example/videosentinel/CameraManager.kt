@@ -14,13 +14,14 @@ import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.example.videosentinel.RectangleDetectionProcessor
+import java.io.Closeable
 
 class CameraManager(
     private val context: Context,
     private val finderView: PreviewView,
     private val lifecycleOwner: LifecycleOwner,
     private val graphicOverlay: RectangleOverlayView
-) {
+) : Closeable {
 
     private var preview: Preview? = null
 
@@ -33,10 +34,19 @@ class CameraManager(
 
     init {
         createNewExecutor()
+        createCppPreview()
     }
 
     private fun createNewExecutor() {
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun createCppPreview(){
+        createpreview()
+    }
+
+    override fun close() {
+        droppreview()
     }
 
     fun startCamera() {
@@ -97,8 +107,15 @@ class CameraManager(
         startCamera()
     }
 
+    // JNI methods
+    external fun createpreview()
+    external fun droppreview()
+
     companion object {
         private const val TAG = "CameraXBasic"
+        init {
+            System.loadLibrary("native-lib")
+        }
     }
 
 }
