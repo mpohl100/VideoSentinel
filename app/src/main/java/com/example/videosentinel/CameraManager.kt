@@ -13,12 +13,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.example.videosentinel.RectangleDetectionProcessor
 
 class CameraManager(
     private val context: Context,
     private val finderView: PreviewView,
     private val lifecycleOwner: LifecycleOwner,
-    private val graphicOverlay: RectangleOverlay
+    private val graphicOverlay: RectangleOverlayView
 ) {
 
     private var preview: Preview? = null
@@ -29,7 +30,6 @@ class CameraManager(
     private var cameraProvider: ProcessCameraProvider? = null
 
     private var imageAnalyzer: ImageAnalysis? = null
-
 
     init {
         createNewExecutor()

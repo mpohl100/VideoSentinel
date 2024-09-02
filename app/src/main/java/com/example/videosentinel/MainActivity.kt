@@ -1,13 +1,15 @@
-package com.androchef.cameraxfacedetection
+package com.example.videosentinel
 
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.Toast
+import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.videosentinel.CameraManager
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.videosentinel.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,7 +36,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClicks() {
-        btnSwitch.setOnClickListener {
+        var button = findViewById<Button>(R.id.btnSwitch);
+        button.setOnClickListener {
             cameraManager.changeCameraSelector()
         }
     }
@@ -56,13 +59,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createCameraManager() {
+        var preview = findViewById<PreviewView>(R.id.previewView_finder)
+        var rectangleOverlay = findViewById<RectangleOverlayView>(R.id.rectangleOverlay_finder)
         cameraManager = CameraManager(
             this,
-            previewView_finder,
+            preview,
             this,
-            graphicOverlay_finder,
-            ::processPicture
+            rectangleOverlay,
         )
+    }
+
+    private fun processPicture(){
+
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
