@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         setupOverlayView()
 
         // Enable preview
-        create_preview()
+        createpreview()
 
         // Start drawing rectangles
         startDrawingRectangles()
@@ -125,8 +125,8 @@ class MainActivity : AppCompatActivity() {
             val bitmap = binding.previewView.bitmap
             bitmap?.let {
                 // Check if native code is ready to receive a new frame
-                if (shall_frame_be_posted()) {
-                    set_frame(it)
+                if (shallframebeposted()) {
+                    setframe(it)
                 }
             }
 
@@ -138,8 +138,8 @@ class MainActivity : AppCompatActivity() {
         handler.post(object : Runnable {
             override fun run() {
                 // Check if new rectangles are available
-                if (are_new_rectangles_available()) {
-                    val rectangles = get_rectangles()
+                if (arenewrectanglesavailable()) {
+                    val rectangles = getrectangles()
                     overlayView.updateRectangles(rectangles)
                 }
                 handler.postDelayed(this, 10)  // Check every 10 milliseconds
@@ -152,16 +152,16 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
 
         // Disable preview
-        drop_preview()
+        droppreview()
     }
 
     // JNI methods
-    external fun create_preview()
-    external fun drop_preview()
-    external fun shall_frame_be_posted(): Boolean
-    external fun set_frame(bitmap: Bitmap)
-    external fun are_new_rectangles_available(): Boolean
-    external fun get_rectangles(): Array<Rectangle>
+    external fun createpreview()
+    external fun droppreview()
+    external fun shallframebeposted(): Boolean
+    external fun setframe(bitmap: Bitmap)
+    external fun arenewrectanglesavailable(): Boolean
+    external fun getrectangles(): Array<Rectangle>
 
     companion object {
         init {

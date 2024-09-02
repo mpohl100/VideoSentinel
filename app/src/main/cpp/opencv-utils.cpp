@@ -7,6 +7,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include <memory>
+#include <mutex>
 
 
 
@@ -48,17 +49,21 @@ void addRectangles(Mat src){
 // preview
 
 static std::shared_ptr<preview::VideoPreview> video_preview = nullptr;
+static std::mutex video_preview_mutex = {};
 
 void create_preview(){
+    std::unique_lock<std::mutex> lock{video_preview_mutex};
     auto* vp = new preview::VideoPreview{1};
     video_preview.reset(vp);
 }
 void drop_preview(){
+    std::unique_lock<std::mutex> lock{video_preview_mutex};
     video_preview = nullptr;
 }
 
 bool shall_frame_be_posted()
 {
+    std::unique_lock<std::mutex> lock{video_preview_mutex};
     if(!video_preview){
         return false;
     }
@@ -68,6 +73,7 @@ bool shall_frame_be_posted()
 
 void set_frame(Mat src)
 {
+    std::unique_lock<std::mutex> lock{video_preview_mutex};
     if(!video_preview){
         return;
     }
@@ -81,6 +87,7 @@ void set_frame(Mat src)
 
 bool are_new_rectangles_available()
 {
+    std::unique_lock<std::mutex> lock{video_preview_mutex};
     if(!video_preview){
         return false;
     }
@@ -89,6 +96,7 @@ bool are_new_rectangles_available()
 
 std::vector<Rectangle> get_rectangles()
 {
+    std::unique_lock<std::mutex> lock{video_preview_mutex};
     if(!video_preview){
         return {};
     }

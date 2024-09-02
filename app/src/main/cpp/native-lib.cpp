@@ -111,28 +111,28 @@ Java_com_example_videosentinel_MainActivity_rect(JNIEnv *env, jobject p_this, jo
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_videosentinel_MainActivity_create_preview(
+Java_com_example_videosentinel_MainActivity_createpreview(
         JNIEnv *env,
         jobject /* this */) {
     create_preview();
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_videosentinel_MainActivitydrop_preview(
+Java_com_example_videosentinel_MainActivity_droppreview(
         JNIEnv *env,
         jobject /* this */) {
     drop_preview();
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_example_videosentinel_MainActivity_shall_frame_be_posted(
+Java_com_example_videosentinel_MainActivity_shallframebeposted(
         JNIEnv *env,
         jobject /* this */) {
     return shall_frame_be_posted();
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_videosentinel_MainActivity_set_frame(
+Java_com_example_videosentinel_MainActivity_setframe(
         JNIEnv *env,
         jobject /* this */,
         jobject bitmapIn) {
@@ -142,14 +142,14 @@ Java_com_example_videosentinel_MainActivity_set_frame(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_example_videosentinel_MainActivity_are_new_rectangles_available(
+Java_com_example_videosentinel_MainActivity_arenewrectanglesavailable(
         JNIEnv *env,
         jobject /* this */) {
     return are_new_rectangles_available();
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
-Java_com_example_videosentinel_MainActivity_get_rectangles(JNIEnv* env, jobject /* this */) {
+Java_com_example_videosentinel_MainActivity_getrectangles(JNIEnv* env, jobject /* this */) {
     // Call the native function to get the vector of rectangles
     std::vector<Rectangle> rectangles = get_rectangles();
 
