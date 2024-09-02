@@ -118,19 +118,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun processFrame(imageProxy: ImageProxy) {
-        if (!isFrameProcessing) {
-            isFrameProcessing = true
-
+        if (shallframebeposted()) {
             // Convert ImageProxy to Bitmap
             val bitmap = binding.previewView.bitmap
             bitmap?.let {
                 // Check if native code is ready to receive a new frame
-                if (shallframebeposted()) {
-                    setframe(it)
-                }
+                setframe(it)
             }
-
-            isFrameProcessing = false
         }
     }
 
