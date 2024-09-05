@@ -67,6 +67,7 @@ bool shall_frame_be_posted()
     if(!video_preview){
         return false;
     }
+    video_preview->update_calculation_status();
     return video_preview->get_frame_calculation_status() == preview::FrameCalculationStatus::NOT_STARTED ||
       video_preview->get_frame_calculation_status() == preview::FrameCalculationStatus::DONE;
 }
