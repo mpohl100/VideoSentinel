@@ -115,9 +115,9 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_example_videosentinel_CameraManager_createpreview(
         JNIEnv *env,
         jobject /* this */) {
-    __android_log_print(ANDROID_LOG_DEBUG, "CreatePreview", "Creating video preview");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.CreatePreview", "Creating video preview");
     create_preview();
-    __android_log_print(ANDROID_LOG_DEBUG, "CreatePreview", "Successfully created video preview");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.CreatePreview", "Successfully created video preview");
 
 }
 
@@ -125,18 +125,18 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_example_videosentinel_CameraManager_droppreview(
         JNIEnv *env,
         jobject /* this */) {
-    __android_log_print(ANDROID_LOG_DEBUG, "DropPreview", "Dropping video preview");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.DropPreview", "Dropping video preview");
     drop_preview();
-    __android_log_print(ANDROID_LOG_DEBUG, "DropPreview", "Successfully dropped video preview");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.DropPreview", "Successfully dropped video preview");
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_example_videosentinel_RectangleDetectionProcessor_shallframebeposted(
         JNIEnv *env,
         jobject /* this */) {
-    __android_log_print(ANDROID_LOG_DEBUG, "QueryFrame", "Ask whether a frame shall be posted");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.QueryFrame", "Ask whether a frame shall be posted");
     auto ret = shall_frame_be_posted();
-    __android_log_print(ANDROID_LOG_DEBUG, "QueryFrame", "Frame shall be posted: %b", ret);
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.QueryFrame", "Frame shall be posted: %b", ret);
     return ret;
 }
 
@@ -145,30 +145,34 @@ Java_com_example_videosentinel_RectangleDetectionProcessor_setframe(
         JNIEnv *env,
         jobject /* this */,
         jobject bitmapIn) {
-    __android_log_print(ANDROID_LOG_DEBUG, "SetFrame", "Posting a frame to the video preview");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.SetFrame", "Posting a frame to the video preview");
     Mat src;
     bitmapToMat(env, bitmapIn, src, false);
+    int rows = src.rows;
+    int cols = src.cols;
+    int channels = src.channels();
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.SetFrame", "Mat Dimensions - Rows: %d, Cols: %d, Channels: %d", rows, cols, channels);
     set_frame(src);
-    __android_log_print(ANDROID_LOG_DEBUG, "SetFrame", "Successfully posted a frame to the video preview");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.SetFrame", "Successfully posted a frame to the video preview");
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_example_videosentinel_RectangleQuerier_arenewrectanglesavailable(
         JNIEnv *env,
         jobject /* this */) {
-    __android_log_print(ANDROID_LOG_DEBUG, "QueryRectangles", "Ask whether new rectangles are available");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.QueryRectangles", "Ask whether new rectangles are available");
     auto ret =  are_new_rectangles_available();
-    __android_log_print(ANDROID_LOG_DEBUG, "QueryRectangles", "New rectangles are available; %b", ret);
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.QueryRectangles", "New rectangles are available; %b", ret);
     return ret;
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_example_videosentinel_RectangleQuerier_getrectangles(JNIEnv* env, jobject /* this */) {
-    __android_log_print(ANDROID_LOG_DEBUG, "GetRectangles", "Getting new rectangles");
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.GetRectangles", "Getting new rectangles");
     // Call the native function to get the vector of rectangles
     std::vector<Rectangle> rectangles = get_rectangles();
 
-    __android_log_print(ANDROID_LOG_DEBUG, "GetRectangles", "Received new rectangles nr.: %i", rectangles.size());
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.GetRectangles", "Received new rectangles nr.: %i", rectangles.size());
 
 
     // Get the Kotlin Rectangle class and its constructor
@@ -185,7 +189,7 @@ Java_com_example_videosentinel_RectangleQuerier_getrectangles(JNIEnv* env, jobje
         env->SetObjectArrayElement(rectArray, i, rectObject);
     }
 
-    __android_log_print(ANDROID_LOG_DEBUG, "GetRectangles", "Returning new kotlin rectangles nr.: %i", env->GetArrayLength(rectArray));
+    __android_log_print(ANDROID_LOG_DEBUG, "Cpp.GetRectangles", "Returning new kotlin rectangles nr.: %i", env->GetArrayLength(rectArray));
 
     return rectArray;
 }

@@ -48,6 +48,7 @@ struct VideoPreview {
     if (is_done) {
       std::unique_lock<std::mutex> lock(_processed_mutex);
       _processed_frame_data = std::move(_current_frame_data);
+      _rectangles_query_status = RectanglesQueryStatus::NOT_REQUESTED;
       _current_original.release();
       _frame_calculation_status = FrameCalculationStatus::DONE;
     }
@@ -70,7 +71,6 @@ struct VideoPreview {
   void set_mat(cv::Mat const &mat, od::Rectangle const &rectangle, int rings,
                int gradient_threshold) {
     _frame_calculation_status = FrameCalculationStatus::IN_PROGRESS;
-    _rectangles_query_status = RectanglesQueryStatus::NOT_REQUESTED;
     _current_original = mat.clone();
     _current_frame_data = webcam::FrameData{_current_original};
     _current_task =
