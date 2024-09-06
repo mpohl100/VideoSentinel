@@ -1,15 +1,15 @@
 package com.example.videosentinel
 
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import android.graphics.Rect
 
 class RectangleQuerier(private val rectangleOverlayView: RectangleOverlayView) {
 
-    fun computeRectangles(){
+    fun computeRectangles(imageRect: Rect){
         // get rectangles from C++ and set them in the rectangleOverlay
         if(arenewrectanglesavailable()){
             val rectangles = getrectangles()
-            rectangleOverlayView.updateRectangles(rectangles)
+            val graphics = rectangles.map{ rect -> ObjectGraphic(rectangleOverlayView, rect, imageRect) }.toTypedArray()
+            rectangleOverlayView.updateRectangles(graphics)
         }
     }
 
