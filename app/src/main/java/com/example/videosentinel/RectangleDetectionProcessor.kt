@@ -11,12 +11,16 @@ class RectangleDetectionProcessor(private val rectangleOverlayView: RectangleOve
 
     @SuppressLint("UnsafeExperimentalUsageError", "UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
-        // post image to C++ code
-        if(shallframebeposted()){
-            val bitmap = imageProxy.toBitmap()
-            setframe(bitmap)
-        }
-        rectangleQuerier.computeRectangles()
+        val mediaImage = imageProxy.image
+        mediaImage?.let{ image -> {
+            // post image to C++ code
+            if(shallframebeposted()){
+                val bitmap = imageProxy.toBitmap()
+                setframe(bitmap)
+            }
+            rectangleQuerier.computeRectangles(image.cropRect)
+        }}
+        imageProxy.close()
     }
 
     // JNI methods
