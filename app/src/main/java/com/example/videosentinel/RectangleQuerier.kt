@@ -8,8 +8,12 @@ class RectangleQuerier(private val rectangleOverlayView: RectangleOverlayView) {
         // get rectangles from C++ and set them in the rectangleOverlay
         if(arenewrectanglesavailable()){
             val rectangles = getrectangles()
-            val graphics = rectangles.map{ rect -> ObjectGraphic(rectangleOverlayView, rect, imageRect) }.toTypedArray()
-            rectangleOverlayView.updateRectangles(graphics)
+            rectangleOverlayView.clear()
+            rectangles.forEach {
+                val objectGraphic = ObjectGraphic(rectangleOverlayView, it, imageRect)
+                rectangleOverlayView.add(objectGraphic)
+            }
+            rectangleOverlayView.postInvalidate()
         }
     }
 
