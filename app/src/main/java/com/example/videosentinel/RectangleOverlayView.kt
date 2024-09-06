@@ -75,10 +75,10 @@ open class RectangleOverlayView(context: Context?, attrs: AttributeSet?) :
             overlay.mOffsetY = offsetY
 
             val mappedBox = RectF().apply {
-                val boxRight = boundingBoxT.x + boundingBoxT.width
-                val boxLeft = boundingBoxT.x
-                val boxTop = boundingBoxT.y
-                val boxBottom = boundingBoxT.y + boundingBoxT.height
+                val boxRight = boundingBoxT.y + boundingBoxT.height
+                val boxLeft = boundingBoxT.y
+                val boxTop = boundingBoxT.x + boundingBoxT.width
+                val boxBottom = boundingBoxT.x
                 left = boxRight * scale + offsetX
                 top = boxTop * scale + offsetY
                 right = boxLeft * scale + offsetX
