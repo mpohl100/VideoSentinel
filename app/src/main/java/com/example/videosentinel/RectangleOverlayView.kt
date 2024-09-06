@@ -152,10 +152,10 @@ open class RectangleOverlayView(context: Context?, attrs: AttributeSet?) :
 
     fun updateRectangles(newRectangles: Array<ObjectGraphic>) {
         clear()
-        newRectangles.forEach { rect -> {
+        newRectangles.forEach { rect -> run {
             add(rect)
         } }
-        invalidate()
+        postInvalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
