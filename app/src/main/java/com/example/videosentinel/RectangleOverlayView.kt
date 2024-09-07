@@ -88,6 +88,17 @@ open class RectangleOverlayView(context: Context?, attrs: AttributeSet?) :
             // for front mode
             if (overlay.isFrontMode()) {
                 val centerX = overlay.width.toFloat() / 2
+                val centerY = overlay.height.toFloat() / 2
+                mappedBox.apply {
+                    left = centerX + (centerX - left)
+                    right = centerX - (right - centerX)
+                    top = centerY + (centerY - top)
+                    bottom = centerY - (bottom - centerY)
+                }
+            }
+            // for back mode
+            if(!overlay.isFrontMode()){
+                val centerX = overlay.width.toFloat() / 2
                 mappedBox.apply {
                     left = centerX + (centerX - left)
                     right = centerX - (right - centerX)
