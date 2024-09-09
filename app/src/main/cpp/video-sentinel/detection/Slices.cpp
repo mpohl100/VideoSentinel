@@ -55,27 +55,32 @@ Slices deduce_slices(const cv::Mat &contours, const Rectangle &rectangle) {
   return slices;
 }
 
+std::shared_ptr<Object> deduce_object(const AnnotatedSlice &first_slice,
+                                      Slices &image_slices) { 
+  auto object_slices = Slices{first_slice.slice.start};
+  // insert the next slice
+  object_slices.slices.push_back(
+      SliceLine{std::vector<AnnotatedSlice>{first_slice},
+                static_cast<size_t>(first_slice.slice.start.y)});
+  // the first direction one iterates is from top to bottom
+  auto direction = Slices::Direction::DOWN;
+  bool increased_object_slices = false;
+  do {
+    increased_object_slices =
+        object_slices.try_add_image_slices(image_slices, direction);
+    direction = object_slices.invert_direction(direction);
+  } while (increased_object_slices);
+  return std::make_shared<Object>(object_slices);
+}
+
 std::vector<std::shared_ptr<Object>> deduce_objects(Slices &slices) {
   std::vector<std::shared_ptr<Object>> objects;
   while (slices.contains_slices()) {
     const auto first_slice = slices.get_first_slice();
-    if(!first_slice.has_value()) {
+    if (!first_slice.has_value()) {
       break;
     }
-    std::vector<AnnotatedSlice> current_slices;
-    current_slices.push_back(*first_slice);
-    auto current_object = std::make_shared<Object>(Slices{
-        math2d::Point{first_slice->slice.start.x, first_slice->slice.start.y}});
-    current_object->slices.slices.push_back(current_slices);
-    while (!current_slices.empty()) {
-      const auto new_current_slices = slices.get_touching_slices(current_slices);
-      if(!new_current_slices.has_value()) {
-        break;
-      }
-      current_object->slices.slices.push_back(*new_current_slices);
-      current_slices = new_current_slices->line();
-    }
-    objects.push_back(current_object);
+    objects.push_back(deduce_object(first_slice.value(), slices));
   }
   return objects;
 }
@@ -152,7 +157,7 @@ void establishing_shot_objects(ObjectsPerRectangle &ret,
   }
   auto objects = deduce_objects(slices);
   ret.set_rectangle(rectangle);
-  for (const auto& object : objects) {
+  for (const auto &object : objects) {
     ret.insert_object(object);
   }
 }
