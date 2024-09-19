@@ -72,40 +72,33 @@ inline void detect_edges(cv::Mat& ret, cv::Mat const &bgrImg, const od::Rectangl
   if(ret.rows != bgrImg.rows || ret.cols != bgrImg.cols){
     throw std::runtime_error("uninitialized ret mat");
   }
+
+  // Convert the BGR image to Grayscale
+  cv::Mat grayImage;
+  cv::cvtColor(bgrImg, grayImage, cv::COLOR_BGR2GRAY);
+
   cv::Vec3b *retCenter;
-  const cv::Vec3b *imgUpper;
-  const cv::Vec3b *imgCenter;
-  const cv::Vec3b *imgLower;
   for (int i = od::row_min(1, rectangle); i < od::row_max(bgrImg.rows - 1, rectangle); ++i) {
     if constexpr (detectionType == DetectionType::Gradient ||
-                  detectionType == DetectionType::Angle)
-      retCenter = ret.ptr<cv::Vec3b>(i);
-    imgUpper = bgrImg.ptr<cv::Vec3b>(i - 1);
-    imgCenter = bgrImg.ptr<cv::Vec3b>(i);
-    imgLower = bgrImg.ptr<cv::Vec3b>(i + 1);
-    for (int j = od::col_min(1, rectangle); j < od::col_max(bgrImg.cols - 1, rectangle); ++j) {
-      int max = 0;
-      int sum = 0;
+                  detectionType == DetectionType::Angle){
+        retCenter = ret.ptr<cv::Vec3b>(i);
+    }
+    for (int j = od::col_min(1, rectangle); j < od::col_max(bgrImg.cols - 1, rectangle); ++j)
+    {
       int degrees = 0;
-      for (int color = 0; color <= 2; color++) {
-        auto ret = gradient<detectionType, 0>(
-            imgUpper[j - 1][color], imgUpper[j][color], imgUpper[j + 1][color],
-            imgCenter[j - 1][color], imgCenter[j][color],
-            imgCenter[j + 1][color], imgLower[j - 1][color], imgLower[j][color],
-            imgLower[j + 1][color]);
-        int grad_c = 0;
-        if constexpr (detectionType == DetectionType::Edge) {
-          grad_c = ret;
-        } else {
-          grad_c = ret.first;
-          degrees = ret.second;
-        }
-        max = grad_c > max ? grad_c : max;
-        sum += grad_c;
+      auto ret_val = gradient<detectionType, 0>(
+        grayImage.at<int>(i - 1, j - 1), grayImage.at<int>(i - 1, j), grayImage.at<int>(i - 1, j + 1),
+        grayImage.at<int>(i, j - 1), grayImage.at<int>(i, j),
+        grayImage.at<int>(i, j + 1), grayImage.at<int>(i + 1, j - 1), grayImage.at<int>(i + 1, j),
+        grayImage.at<int>(i + 1, j + 1));
+      int grad_c = 0;
+      if constexpr (detectionType == DetectionType::Edge) {
+        grad_c = ret_val;
+      } else {
+        grad_c = ret_val.first;
+        degrees = ret_val.second;
       }
-      float val = float(max) / float(sum);
-      val = std::sqrt(val);
-      val *= max;
+      auto val = float(grad_c);
 
       if constexpr (detectionType == DetectionType::Edge) {
         ret.at<uchar>(i, j) = int(val);
