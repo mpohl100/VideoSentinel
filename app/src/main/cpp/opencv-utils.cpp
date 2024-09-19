@@ -79,7 +79,7 @@ void set_frame(Mat src)
         return;
     }
     int rings = 1;
-    int gradient_threshold = 20;
+    int gradient_threshold = 15;
     video_preview->set_mat(
             src,
             od::Rectangle{0, 0, src.cols, src.rows}, rings,
