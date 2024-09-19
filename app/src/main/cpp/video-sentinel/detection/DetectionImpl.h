@@ -87,10 +87,10 @@ inline void detect_edges(cv::Mat& ret, cv::Mat const &bgrImg, const od::Rectangl
     {
       int degrees = 0;
       auto ret_val = gradient<detectionType, 0>(
-        grayImage.at<int>(i - 1, j - 1), grayImage.at<int>(i - 1, j), grayImage.at<int>(i - 1, j + 1),
-        grayImage.at<int>(i, j - 1), grayImage.at<int>(i, j),
-        grayImage.at<int>(i, j + 1), grayImage.at<int>(i + 1, j - 1), grayImage.at<int>(i + 1, j),
-        grayImage.at<int>(i + 1, j + 1));
+        static_cast<int>(grayImage.at<uchar>(i - 1, j - 1)), static_cast<int>(grayImage.at<uchar>(i - 1, j)), static_cast<int>(grayImage.at<uchar>(i - 1, j + 1)),
+        static_cast<int>(grayImage.at<uchar>(i, j - 1)), static_cast<int>(grayImage.at<uchar>(i, j)),
+        static_cast<int>(grayImage.at<uchar>(i, j + 1)), static_cast<int>(grayImage.at<uchar>(i + 1, j - 1)), static_cast<int>(grayImage.at<uchar>(i + 1, j)),
+        static_cast<int>(grayImage.at<uchar>(i + 1, j + 1)));
       int grad_c = 0;
       if constexpr (detectionType == DetectionType::Edge) {
         grad_c = ret_val;
