@@ -169,7 +169,7 @@ deduce_touching_rectangles(const od::Rectangle &rectangle,
 std::vector<od::Rectangle>
 split_rectangle_into_parts(const od::Rectangle &rectangle,
                            int nb_pixels_per_tile) {
-  constexpr auto debug = true;
+  constexpr auto debug = false;
   std::vector<od::Rectangle> rectangles;
   for (size_t y = rectangle.y; y < rectangle.y + rectangle.height;
        y += nb_pixels_per_tile) {
@@ -178,10 +178,12 @@ split_rectangle_into_parts(const od::Rectangle &rectangle,
       rectangles.emplace_back(x, y, nb_pixels_per_tile, nb_pixels_per_tile);
     }
   }
-  if(debug){
+  if constexpr (debug) {
     std::cout << "Rectangles: " << std::endl;
-    for(const auto& rect : rectangles){
-      std::cout << "x: " << rect.x << " y: " << rect.y << " width: " << rect.width << " height: " << rect.height << std::endl;
+    for (const auto &rect : rectangles) {
+      std::cout << "x: " << rect.x << " y: " << rect.y
+                << " width: " << rect.width << " height: " << rect.height
+                << std::endl;
     }
   }
   return rectangles;
@@ -191,7 +193,7 @@ FrameData process_frame_merged(const cv::Mat &imgOriginal,
                                const od::Rectangle &rectangle,
                                par::Executor &executor, int rings,
                                int gradient_threshold, int nb_pixels_per_tile) {
-  constexpr auto debug = true;
+  constexpr auto debug = false;
   auto frame_data = FrameData{imgOriginal};
   const auto rectangles =
       split_rectangle_into_parts(rectangle, nb_pixels_per_tile);
@@ -202,11 +204,11 @@ FrameData process_frame_merged(const cv::Mat &imgOriginal,
 
   for (const auto &rect : rectangles) {
     const auto calcGradient = [&, rect]() {
-      if (debug)
+      if constexpr (debug)
         std::cout << "calculating gradient for rect " << rect.to_string()
                   << std::endl;
       od::detect_directions(frame_data.gradient, imgOriginal, rect);
-      if (debug)
+      if constexpr (debug)
         std::cout << "gradient processedfor rect " << rect.to_string()
                   << std::endl;
     };
@@ -216,22 +218,22 @@ FrameData process_frame_merged(const cv::Mat &imgOriginal,
 
   for (const auto &rect : rectangles) {
     const auto calcSmoothedContours = [&, rect, rings, gradient_threshold]() {
-      if (debug)
+      if constexpr (debug)
         std::cout << "calculating smoothed contours for rect "
                   << rect.to_string() << std::endl;
       od::smooth_angles(frame_data.smoothed_contours_mat, frame_data.gradient,
                         rings, true, gradient_threshold, rect);
-      if (debug)
+      if constexpr (debug)
         std::cout << "smoothed contours processed for rect " << rect.to_string()
                   << std::endl;
     };
     const auto calcAllRectangles = [&, rect]() {
-      if (debug)
+      if constexpr (debug)
         std::cout << "calculating all rectangles for rect " << rect.to_string()
                   << std::endl;
       od::establishing_shot_slices(frame_data.all_rectangles,
                                    frame_data.smoothed_contours_mat, rect);
-      if (debug)
+      if constexpr (debug)
         std::cout << "all rectangles processed for rect " << rect.to_string()
                   << std::endl;
     };
@@ -275,7 +277,7 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
                                       par::Executor &executor, int rings,
                                       int gradient_threshold,
                                       int nb_pixels_per_tile) {
-  constexpr auto debug = true;
+  constexpr auto debug = false;
   auto frame_data = FrameData{imgOriginal};
   const auto rectangles =
       split_rectangle_into_parts(rectangle, nb_pixels_per_tile);
@@ -286,11 +288,11 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
 
   for (const auto &rect : rectangles) {
     const auto calcGradient = [&, rect]() {
-      if (debug)
+      if constexpr (debug)
         std::cout << "calculating gradient for rect " << rect.to_string()
                   << std::endl;
       od::detect_directions(frame_data.gradient, imgOriginal, rect);
-      if (debug)
+      if constexpr (debug)
         std::cout << "gradient processedfor rect " << rect.to_string()
                   << std::endl;
     };
@@ -310,24 +312,24 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
       static_cast<size_t>(rectangle.width / nb_pixels_per_tile) + 1};
   for (const auto &rect : rectangles) {
     const auto calcSmoothedContours = [&, rect, rings, gradient_threshold]() {
-      if (debug)
+      if constexpr (debug)
         std::cout << "calculating smoothed contours for rect "
                   << rect.to_string() << std::endl;
       od::smooth_angles(frame_data.smoothed_contours_mat, frame_data.gradient,
                         rings, true, gradient_threshold, rect);
-      if (debug)
+      if constexpr (debug)
         std::cout << "smoothed contours processed for rect " << rect.to_string()
                   << std::endl;
     };
     const auto calcAllObjects = [&, rect]() {
-      if (debug)
+      if constexpr (debug)
         std::cout << "calculating all rectangles for rect " << rect.to_string()
                   << std::endl;
       od::establishing_shot_objects(
           frame_data.all_objects.get(rect.y / nb_pixels_per_tile,
                                      rect.x / nb_pixels_per_tile),
           frame_data.smoothed_contours_mat, rect);
-      if (debug)
+      if constexpr (debug)
         std::cout << "all rectangles processed for rect " << rect.to_string()
                   << std::endl;
     };
@@ -371,8 +373,10 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
         std::cout
             << frame_data.all_objects.get(row, col).get_rectangle().to_string()
             << std::endl;
-        for(const auto& object : frame_data.all_objects.get(row, col).get_objects()){
-          std::cout << "object: " << object->get_bounding_box().to_string() << std::endl;
+        for (const auto &object :
+             frame_data.all_objects.get(row, col).get_objects()) {
+          std::cout << "object: " << object->get_bounding_box().to_string()
+                    << std::endl;
         }
       }
     }
@@ -385,12 +389,14 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
     auto flow = par::Flow{};
     for (size_t col = 1; col < frame_data.all_objects.get_cols(); ++col) {
       const auto append_right = [&, row, col]() {
-        if(debug){
-          std::cout << "Appending right row " << row << " col " << col << std::endl;
+        if constexpr (debug) {
+          std::cout << "Appending right row " << row << " col " << col
+                    << std::endl;
         }
         line_objects[row].append_right(frame_data.all_objects.get(row, col));
-        if(debug)
-          std::cout << "Finished appending right row " << row << " col " << col << std::endl;
+        if constexpr (debug)
+          std::cout << "Finished appending right row " << row << " col " << col
+                    << std::endl;
       };
       flow.add(par::Calculation{append_right});
     }
@@ -404,16 +410,116 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
   }
   frame_data.result_objects = line_objects[0];
   for (size_t i = 1; i < line_objects.size(); ++i) {
-    if(debug)
+    if constexpr (debug)
       std::cout << "Appending down row " << i << std::endl;
     frame_data.result_objects.append_down(line_objects[i]);
-    if(debug)
+    if constexpr (debug)
       std::cout << "Finished appending down row " << i << std::endl;
   }
 
   frame_data.all_rectangles = od::deduce_rectangles(frame_data.result_objects);
 
   return frame_data;
+}
+
+par::TaskGraph process_frame_with_parallel_gradient(
+    FrameData &frame_data, const cv::Mat &imgOriginal,
+    const od::Rectangle &rectangle, int rings, int gradient_threshold,
+    int nb_pixels_per_tile) {
+  constexpr auto debug = false;
+  const auto rectangles =
+      split_rectangle_into_parts(rectangle, nb_pixels_per_tile);
+  std::vector<par::Task> gradient_tasks;
+  gradient_tasks.reserve(rectangles.size());
+  std::vector<par::Task> smoothing_tasks;
+  smoothing_tasks.reserve(rectangles.size());
+
+  for (const auto &rect : rectangles) {
+    const auto calcGradient = [&, rect]() {
+      if constexpr (debug)
+        std::cout << "calculating gradient for rect " << rect.to_string()
+                  << std::endl;
+      od::detect_directions(frame_data.gradient, imgOriginal, rect);
+      if constexpr (debug)
+        std::cout << "gradient processedfor rect " << rect.to_string()
+                  << std::endl;
+    };
+    auto calculation = par::Calculation{calcGradient};
+    gradient_tasks.emplace_back(calculation.make_task());
+  }
+
+  // print all rectangles:
+  if constexpr (debug) {
+    for (const auto &rect : rectangles) {
+      std::cout << "rect: " << rect.to_string() << std::endl;
+    }
+  }
+
+  frame_data.all_objects = od::AllObjects{
+      static_cast<size_t>(rectangle.height / nb_pixels_per_tile) + 1,
+      static_cast<size_t>(rectangle.width / nb_pixels_per_tile) + 1};
+  for (const auto &rect : rectangles) {
+    const auto calcSmoothedContours = [&, rect, rings, gradient_threshold]() {
+      if constexpr (debug)
+        std::cout << "calculating smoothed contours for rect "
+                  << rect.to_string() << std::endl;
+      od::smooth_angles(frame_data.smoothed_contours_mat, frame_data.gradient,
+                        rings, true, gradient_threshold, rect);
+      if constexpr (debug)
+        std::cout << "smoothed contours processed for rect " << rect.to_string()
+                  << std::endl;
+    };
+
+    auto calc = par::Calculation{calcSmoothedContours};
+
+    smoothing_tasks.emplace_back(calc.make_task());
+  }
+
+  // define dependencies between tasks
+  size_t i = 0;
+  for (const auto &rect : rectangles) {
+    std::vector<size_t> touching_rectangles =
+        deduce_touching_rectangles(expand_rectangle(rect, rings), rectangles);
+    for (const auto &touching_rectangle : touching_rectangles) {
+      smoothing_tasks[i].succeed(gradient_tasks[touching_rectangle]);
+    }
+    i++;
+  }
+
+  // kick off tasks
+  auto task_graph = par::TaskGraph{};
+  for (auto &gradient_task : gradient_tasks) {
+    task_graph.add_task(gradient_task);
+  }
+  for (auto &smoothing_task : smoothing_tasks) {
+    task_graph.add_task(smoothing_task);
+  }
+
+  // merge all objects
+  const auto calcAllRectangles = [&, rectangle]() {
+    if constexpr (debug) {
+      std::cout << "calculating all rectangles" << std::endl;
+    }
+    od::establishing_shot_slices(frame_data.all_rectangles,
+                                 frame_data.smoothed_contours_mat, rectangle);
+    if constexpr (debug) {
+      std::cout << "all rectangles processed" << std::endl;
+    }
+  };
+
+  auto calc = par::Calculation(calcAllRectangles);
+  auto objects_task = calc.make_task();
+  for (auto &task : gradient_tasks) {
+    objects_task.succeed(task);
+  }
+
+  for (auto &task : smoothing_tasks) {
+    objects_task.succeed(task);
+  }
+
+  task_graph.add_task(objects_task);
+
+  return task_graph;
 }
 
 } // namespace webcam
