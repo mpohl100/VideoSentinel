@@ -53,7 +53,7 @@ static std::mutex video_preview_mutex = {};
 
 void create_preview(){
     std::unique_lock<std::mutex> lock{video_preview_mutex};
-    auto* vp = new preview::VideoPreview{1};
+    auto* vp = new preview::VideoPreview{4};
     video_preview.reset(vp);
 }
 void drop_preview(){
