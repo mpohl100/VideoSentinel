@@ -1,8 +1,8 @@
 #pragma once
 
+#include "detection/AllObjects.h"
 #include "detection/Detection.h"
 #include "detection/Object.h"
-#include "detection/AllObjects.h"
 #include "detection/ObjectsPerRectangle.h"
 #include "detection/Slices.h"
 
@@ -71,5 +71,10 @@ FrameData process_frame_merge_objects(const cv::Mat &imgOriginal,
                                       par::Executor &executor, int rings,
                                       int gradient_threshold,
                                       int nb_pixels_per_tile = 100);
+
+par::TaskGraph process_frame_with_parallel_gradient(
+    FrameData &frame_data, const cv::Mat &imgOriginal,
+    const od::Rectangle &rectangle, int rings, int gradient_threshold,
+    int nb_pixels_per_tile = 100);
 
 } // namespace webcam
