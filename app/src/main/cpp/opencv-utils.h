@@ -16,6 +16,7 @@ struct Rectangle{
     int height = 1;
 };
 
+void set_single_object_preview_settings(bool activate_filter, const std::string& ascii_art, int angle_step_skeleton, double comparison_tolerance, bool comparison_only_outer);
 void create_preview();
 void drop_preview();
 bool shall_frame_be_posted();
