@@ -1,14 +1,17 @@
 #include "opencv-utils.h"
 #include "video-sentinel/webcam/webcam.h"
 #include "video-sentinel/par/parallel.h"
+#include "video-sentinel/deduction/ComparisonParams.h"
+#include "video-sentinel/deduction/SkeletonParams.h"
 #include "video-sentinel/detection/Rectangle.h"
 #include "video-sentinel/preview/preview.h"
+#include "video-sentinel/preview/SingleObjectPreview.h"
 
 #include <opencv2/imgproc.hpp>
 
 #include <memory>
 #include <mutex>
-
+#include <optional>
 
 
 void myFlip(Mat src) {
@@ -48,11 +51,31 @@ void addRectangles(Mat src){
 // ---------------------------------------------------------------------------------------------------------------
 // preview
 
+struct SingleObjectPreviewParams{
+    bool activate_filter = true;
+    std::string ascii_art;
+    deduct::SkeletonParams skeleton_params;
+    deduct::ComparisonParams comparison_params;
+};
+
+static std::optional<SingleObjectPreviewParams> single_object_preview_params = std::nullopt;
 static std::shared_ptr<preview::VideoPreview> video_preview = nullptr;
 static std::mutex video_preview_mutex = {};
 
+void set_single_object_preview_settings(bool activate_filter, const std::string& ascii_art, int angle_step_skeleton, double comparison_tolerance, bool comparison_only_outer)
+{
+    single_object_preview_params = SingleObjectPreviewParams{ activate_filter, ascii_art, deduct::SkeletonParams{angle_step_skeleton}, deduct::ComparisonParams{comparison_tolerance, comparison_only_outer}};
+    drop_preview();
+    create_preview();
+}
+
 void create_preview(){
     std::unique_lock<std::mutex> lock{video_preview_mutex};
+    if(single_object_preview_params.has_value() && single_object_preview_params->activate_filter){
+        auto* vp = new preview::SingleObjectPreview{4, single_object_preview_params->ascii_art, single_object_preview_params->skeleton_params, single_object_preview_params->comparison_params};
+        video_preview.reset(vp);
+        return;
+    }
     auto* vp = new preview::VideoPreview{4};
     video_preview.reset(vp);
 }
