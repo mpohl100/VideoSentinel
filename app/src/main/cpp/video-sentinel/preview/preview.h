@@ -34,8 +34,12 @@ struct VideoPreview {
   VideoPreview &operator=(const VideoPreview &) = delete;
   VideoPreview &operator=(VideoPreview &&) = delete;
 
-  ~VideoPreview() {
-    if (_frame_calculation_status == FrameCalculationStatus::IN_PROGRESS) {
+  virtual ~VideoPreview() {
+    bool do_wait = true;
+    for(auto task : _current_task_graph.get_tasks()) {
+      do_wait = do_wait && !_executor.does_not_know(task);
+    }
+    if (_frame_calculation_status == FrameCalculationStatus::IN_PROGRESS && do_wait) {
       _executor.wait_for(_current_task_graph);
     }
   }
@@ -61,7 +65,7 @@ struct VideoPreview {
     return _rectangles_query_status;
   }
 
-  std::vector<od::Rectangle> get_all_rectangles() {
+  virtual std::vector<od::Rectangle> get_all_rectangles() {
     std::unique_lock<std::mutex> lock(_processed_mutex);
     _rectangles_query_status = RectanglesQueryStatus::REQUESTED;
     return _processed_frame_data.all_rectangles.rectangles;
@@ -73,18 +77,21 @@ struct VideoPreview {
     _rectangles_query_status = RectanglesQueryStatus::NOT_REQUESTED;
     _current_original = mat.clone();
     _current_frame_data = webcam::FrameData{_current_original};
-    _current_task_graph = webcam::process_frame_with_parallel_gradient(
-        _current_frame_data, _current_original, rectangle, rings,
-        gradient_threshold, 128);
+    _current_task_graph = webcam::process_frame_single_loop(_current_frame_data,
+                                                            _current_original);
+    adjust_task_graph(_current_task_graph);
     _executor.run(_current_task_graph);
   }
 
-private:
+  virtual void adjust_task_graph([[maybe_unused]] par::TaskGraph &task_graph) {}
+
+protected:
   par::Executor _executor;
-  cv::Mat _current_original;
   webcam::FrameData _current_frame_data;
-  webcam::FrameData _processed_frame_data;
   par::TaskGraph _current_task_graph;
+private:
+  cv::Mat _current_original;
+  webcam::FrameData _processed_frame_data;
   FrameCalculationStatus _frame_calculation_status =
       FrameCalculationStatus::NOT_STARTED;
   RectanglesQueryStatus _rectangles_query_status =
