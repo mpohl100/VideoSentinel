@@ -112,6 +112,38 @@ Java_com_example_videosentinel_MainActivity_rect(JNIEnv *env, jobject p_this, jo
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_example_videosentinel_SettingsManager_applySettings(
+        JNIEnv* env,
+        jobject /* this */,
+        jboolean activateFilter,
+        jstring asciiArt,
+        jint angleStepSkeleton,
+        jdouble comparisonTolerance,
+        jboolean comparisonOnlyOuter
+) {
+    // Convert jstring to std::string
+    const char* asciiArtChars = env->GetStringUTFChars(asciiArt, nullptr);
+    std::string asciiArtCpp(asciiArtChars);
+    env->ReleaseStringUTFChars(asciiArt, asciiArtChars);
+
+    // Prepare the C++ struct
+    bool activate_filter = static_cast<bool>(activateFilter);
+    std::string ascii_art = asciiArtCpp;
+    int angle_step_skeleton = angleStepSkeleton;
+    double comparison_params_tolerance = comparisonTolerance;
+    bool comparison_params_only_outer = static_cast<bool>(comparisonOnlyOuter);
+
+    // Call the original C++ function
+    set_single_object_preview_settings(
+            activate_filter,
+            ascii_art,
+            angle_step_skeleton,
+            comparison_params_tolerance,
+            comparison_params_only_outer
+    );
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_example_videosentinel_CameraManager_createpreview(
         JNIEnv *env,
         jobject /* this */) {
