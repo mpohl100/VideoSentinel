@@ -16,13 +16,13 @@
         android:key="angle_step_skeleton"
         android:title="Angle Step Skeleton"
         android:summary="Set skeleton angle step"
-        android:inputType="number" />
+        android:inputType="text" />
 
     <EditTextPreference
         android:key="comparison_tolerance"
         android:title="Comparison Tolerance"
         android:summary="Set comparison tolerance (double)"
-        android:inputType="numberDecimal" />
+        android:inputType="text" />
 
     <SwitchPreferenceCompat
         android:key="comparison_only_outer"

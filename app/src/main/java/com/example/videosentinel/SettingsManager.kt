@@ -22,8 +22,8 @@ class SettingsManager(context: Context) {
         return SettingsData(
             activateFilter = sharedPreferences.getBoolean("activate_filter", true),
             asciiArt = sharedPreferences.getString("ascii_art", "") ?: "",
-            angleStepSkeleton = sharedPreferences.getInt("angle_step_skeleton", 15),
-            comparisonTolerance = sharedPreferences.getFloat("comparison_tolerance", 0.05f).toDouble(),
+            angleStepSkeleton = sharedPreferences.getString("angle_step_skeleton", "15")?.toIntOrNull() ?: 15,
+            comparisonTolerance = sharedPreferences.getString("comparison_tolerance", "0.05")?.toDoubleOrNull() ?: 0.05,
             comparisonOnlyOuter = sharedPreferences.getBoolean("comparison_only_outer", true)
         )
     }
@@ -33,8 +33,8 @@ class SettingsManager(context: Context) {
         with(sharedPreferences.edit()) {
             putBoolean("activate_filter", data.activateFilter)
             putString("ascii_art", data.asciiArt)
-            putInt("angle_step_skeleton", data.angleStepSkeleton)
-            putFloat("comparison_tolerance", data.comparisonTolerance.toFloat())
+            putString("angle_step_skeleton", data.angleStepSkeleton.toString())
+            putString("comparison_tolerance", data.comparisonTolerance.toFloat().toString())
             putBoolean("comparison_only_outer", data.comparisonOnlyOuter)
             apply()
         }
