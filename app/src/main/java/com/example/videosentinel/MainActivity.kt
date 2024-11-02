@@ -41,14 +41,14 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
             cameraManager.changeCameraSelector()
         }
-        var buttonSwitch = findViewById<Button>(R.id.btnSettings);
-        button.setOnClickListener{
+        var buttonSettings = findViewById<Button>(R.id.btnSettings);
+        buttonSettings.setOnClickListener{
             openSettingsActivity()
         }
     }
 
     private fun openSettingsActivity() {
-        val intent = Intent(this, SettingsActivity::class.java)
+        val intent = Intent(this@MainActivity, SettingsActivity::class.java)
         startActivity(intent)
     }
 
