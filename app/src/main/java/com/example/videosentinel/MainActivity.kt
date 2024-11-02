@@ -1,6 +1,7 @@
 package com.example.videosentinel
 
 import android.content.pm.PackageManager
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -40,6 +41,15 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
             cameraManager.changeCameraSelector()
         }
+        var buttonSwitch = findViewById<Button>(R.id.btnSettings);
+        button.setOnClickListener{
+            openSettingsActivity()
+        }
+    }
+
+    private fun openSettingsActivity() {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onRequestPermissionsResult(
