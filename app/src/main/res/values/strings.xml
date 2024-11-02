@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Video Sentinel</string>
+
+    <string name="ascii_art_default">
+    <![CDATA[
+
+
+
+     XXXXXXXXXX
+     XXXXXXXXXX
+     XXXXXXXXXX
+     XXXXXXXXXX
+     XXXXOXXXXX
+     XXXXXXXXXX
+     XXXXXXXXXX
+     XXXXXXXXXX
+     XXXXXXXXXX
+     XXXXXXXXXX
+
+
+
+        ]]>
+    </string>
+
 </resources>
