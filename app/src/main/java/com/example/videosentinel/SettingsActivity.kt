@@ -5,6 +5,12 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity : AppCompatActivity() {
+    // Initialize SettingsManager with context in the constructor
+    private val settingsManager: SettingsManager by lazy {
+        SettingsManager(applicationContext)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -24,5 +30,11 @@ class SettingsActivity : AppCompatActivity() {
             // below line is to inflate our fragment.
             fragmentManager.beginTransaction().add(R.id.idFrameLayout, SettingsFragment()).commit()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Apply the settings when the activity is closed
+        settingsManager.prepareAndApplySettings()
     }
 }
