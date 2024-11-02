@@ -9,7 +9,8 @@
         android:key="ascii_art"
         android:title="ASCII Art"
         android:summary="Enter ASCII art text"
-        android:inputType="text" />
+        android:inputType="text"
+        android:defaultValue="@string/ascii_art_default"/>
 
     <EditTextPreference
         android:key="angle_step_skeleton"
