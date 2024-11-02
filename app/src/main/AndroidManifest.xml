@@ -27,5 +27,6 @@
         </activity>
         <activity android:name=".PhotoActivity" />
         <activity android:name=".VideoActivity" />
+        <activity android:name=".SettingsActivity" />
     </application>
 </manifest>

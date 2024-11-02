@@ -1,14 +1,11 @@
 package com.example.videosentinel
 
 import android.os.Bundle
-import android.preference.PreferenceFragment
+import androidx.preference.PreferenceFragmentCompat
 
-class SettingsFragment : PreferenceFragment() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // below line is used to add preference
-        // fragment from our xml folder.
-        addPreferencesFromResource(R.xml.preferences)
+class SettingsFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
 }

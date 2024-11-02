@@ -27,14 +27,18 @@
     </FrameLayout>
 
 
+    eft and btnSettings appears to the right of it. Here's how you can modify the XML code to achieve that layout:
+
+    xml
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="switch camera"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnSettings" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSettings"
@@ -42,7 +46,6 @@
         android:layout_height="wrap_content"
         android:text="settings"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:layout_constraintStart_toEndOf="@id/btnSwitch"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

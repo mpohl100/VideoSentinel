@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreferenceCompat
+    <androidx.preference.SwitchPreferenceCompat
         android:key="activate_filter"
         android:title="Activate Filter"
         android:defaultValue="true" />
