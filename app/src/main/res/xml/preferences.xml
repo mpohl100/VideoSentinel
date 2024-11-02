@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreferenceCompat
+        android:key="activate_filter"
+        android:title="Activate Filter"
+        android:defaultValue="true" />
+
+    <EditTextPreference
+        android:key="ascii_art"
+        android:title="ASCII Art"
+        android:summary="Enter ASCII art text"
+        android:inputType="text" />
+
+    <EditTextPreference
+        android:key="angle_step_skeleton"
+        android:title="Angle Step Skeleton"
+        android:summary="Set skeleton angle step"
+        android:inputType="number" />
+
+    <EditTextPreference
+        android:key="comparison_tolerance"
+        android:title="Comparison Tolerance"
+        android:summary="Set comparison tolerance (double)"
+        android:inputType="numberDecimal" />
+
+    <SwitchPreferenceCompat
+        android:key="comparison_only_outer"
+        android:title="Comparison Only Outer"
+        android:defaultValue="true" />
+
+</PreferenceScreen>
