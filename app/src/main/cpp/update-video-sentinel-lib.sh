@@ -1,5 +1,5 @@
 rm -rf video-sentinel
-git clone git@github.com:mpohl100/video-sentinel-cpp.git -b fix_rectangles temp-clone
+git clone git@github.com:mpohl100/video-sentinel-cpp.git temp-clone
 cp -r temp-clone/src/ video-sentinel/
 rm -rf temp-clone
 cd video-sentinel
